@@ -1,48 +1,55 @@
-//import logo from './logo.svg';
-//import './App.css';
-//import Greet from "./components/greet";
-//import welcome from "./components/welcome";
-//import Welcome from "./components/welcome";
-//import Message from "./components/message"
-import React , { Component } from 'react';
-//import Axios from "axios";
-import axios from 'axios';
+import React, {Component, useState, useEffect } from 'react';
 
-import Loading from "./components/loading"
+
+const App= () => {
+  const [ articles, setArticle ] = useState([]);
+  const [ searchQuery, setsearchQuery]  = useState('Blockchain')
+  const [url, setURL] = useState('http://newsapi.org/v2/everything?q=blockchain&from=2021-03-02&sortBy=publishedAt&apiKey=16e6ffaa1cea436fb8a9ee615c2a608e');
+  const [loading, setLoading] = useState(false);
+
+// const increment = () => {
+//   setCount(count + 1);
+
+// }
+
+const fetchArticle = () => {
+  setLoading(true)
+  fetch(url)
+  .then( result => result.json())
+.then(data => (setArticle(data.articles), setLoading(false))).catch(error => console.log(error))
+
+}
+
+useEffect(() => {
+  fetchArticle();
+}, [ url ]);
+
+
+const  handleChange = (e) => {
  
-class App extends Component {
-  constructor(props){
-    super(props);
-  this.state = {
-   articles: [],
-   loading: false
-  }
-  }
- getUsers() {
-  this.setState({
-    loading: true
+  setsearchQuery(e.target.value)
 
-  })
-  axios("http://newsapi.org/v2/everything?q=tesla&from=2021-03-02&sortBy=publishedAt&apiKey=16e6ffaa1cea436fb8a9ee615c2a608e").then(response => this.setState({
-      articles: response.data.articles,
-      loading: false
-    }) )
- }
-   componentWillMount() {
-    this.getUsers();
-  }
-  
-  render() {
-    return (
-      <div className="App"> 
-        {!this.state.loading ? (this.state.articles.map(article => <div>{article.publishedAt}</div>)) : ( <Loading />) }
-       </div>
-    )
-  }
-    
-  }
+}
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  setURL(`http://newsapi.org/v2/everything?q=${searchQuery}&from=2021-03-02&sortBy=publishedAt&apiKey=16e6ffaa1cea436fb8a9ee615c2a608e`)
 
 
-  
+}
 
-export default App;
+return (
+<div>
+      <h1>Counter App</h1>
+      { loading ? <h2>Loading.....</h2> : " " }
+      <form value={searchQuery} onSubmit={handleSubmit} >
+        <input type="text" value={searchQuery} onChange={handleChange} ></input>
+        <button>Search</button>
+      </form>
+     {articles.map((articles, i) => (
+    <p key={i} >{articles.title}</p>
+     ))}
+</div>
+);
+}
+export default App
